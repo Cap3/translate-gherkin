@@ -1,0 +1,29 @@
+{
+  "name": "translate-gherkin",
+  "version": "0.1.0",
+  "description": "A tool for the translation of keywords in Gherkin files",
+  "main": "index.js",
+  "bin": {
+    "translate-gherkin": "bin/translate.js"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/just95/translate-gherkin.git"
+  },
+  "keywords": [
+    "Cucumber",
+    "Gherkin"
+  ],
+  "author": "Justin Andresen <justin.andresen@cap3.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/just95/translate-gherkin/issues"
+  },
+  "homepage": "https://github.com/just95/translate-gherkin#readme"
+}

@@ -9,13 +9,14 @@ const Messages = require("@cucumber/messages");
  * Translator for the keywords in Gherkin files.
  */
 class GherkinTranslator {
-  constructor({ outputDialect, enableLogging, dryRun }) {
+  constructor({ outputDialectCode, enableLogging, dryRun }) {
     this.enableLogging = enableLogging;
     this.dryRun = dryRun;
 
     // Validate that the specified Gherkin dialect exists.
-    this.outputDialect = Gherkin.dialects[outputDialect];
-    if (!this.outputDialect) throw `Unknown dialect: ${outputDialect}`;
+    this.outputDialectCode = outputDialectCode;
+    this.outputDialect = Gherkin.dialects[outputDialectCode];
+    if (!this.outputDialect) throw `Unknown dialect: ${outputDialectCode}`;
 
     // Initialize parser.
     const uuidGenerator = Messages.IdGenerator.uuid();
@@ -71,6 +72,10 @@ class GherkinTranslator {
       ` - from ${sourceDialect.name} to ${this.outputDialect.name} dialect`
     );
 
+    // Translate the language annotation.
+    const sourceLines = source.split("\n");
+    this.translateLanguageComment(sourceLines);
+
     // Walk the Gherkin document and translate the keyword of all nodes.
     const handler = (node, sourceLines) =>
       this.translateKeywordOf(node, { sourceLines, sourceDialect });
@@ -84,10 +89,35 @@ class GherkinTranslator {
     };
     const translatedLines = GherkinUtils.walkGherkinDocument(
       document,
-      source.split("\n"),
+      sourceLines,
       handlers
     );
     return translatedLines.join("\n");
+  }
+
+  /**
+   * Translates the language comment at the top of a Gherkin file.
+   *
+   * Modifies the first line of the given array in-place.
+   *
+   * @param {string[]} sourceLines An array of the lines of Gherkin source code.
+   */
+  translateLanguageComment(sourceLines) {
+    // Make sure that there is at least one line.
+    if (sourceLines.length == 0) return;
+
+    // Test if the first line of the file is the language annotation.
+    const firstLine = sourceLines[0];
+    const pattern = /^(\s*#\s*language:\s*)(\w+)(\s*)$/;
+    const match = firstLine.match(pattern);
+    if (!match) return;
+
+    // Replace the first line but keep all spaces as in the input.
+    const prefix = match[1];
+    const code = match[2];
+    const suffix = match[3];
+    sourceLines[0] = `${prefix}${this.outputDialectCode}${suffix}`;
+    this.log(` - line 1: language: ${code} -> ${this.outputDialectCode}`);
   }
 
   /**

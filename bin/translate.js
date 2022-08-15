@@ -44,7 +44,7 @@ program
 
     try {
       const translator = new GherkinTranslator({
-        outputDialect: opts.dialect,
+        outputDialectCode: opts.dialect,
         enableLogging: !opts.quiet,
         dryRun: opts.dryRun,
       });

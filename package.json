@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/just95/translate-gherkin/issues"
   },
-  "homepage": "https://github.com/just95/translate-gherkin#readme"
+  "homepage": "https://github.com/just95/translate-gherkin#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^9.4.0"
+  }
 }

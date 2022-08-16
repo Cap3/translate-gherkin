@@ -17,8 +17,14 @@ class GherkinTranslator {
    */
   static DEFAULT_DIALECT_CODE = "en";
 
-  constructor({ outputDialectCode, enableLogging, dryRun }) {
+  constructor({
+    outputDialectCode,
+    enableLogging,
+    enableVerboseLogging,
+    dryRun,
+  }) {
     this.enableLogging = enableLogging;
+    this.enableVerboseLogging = enableVerboseLogging;
     this.dryRun = dryRun;
 
     // Validate that the specified Gherkin dialect exists.
@@ -73,10 +79,10 @@ class GherkinTranslator {
     // Do nothing if the document is written in the right dialect already.
     const sourceDialect = Gherkin.dialects[document.feature.language];
     if (sourceDialect == this.outputDialect) {
-      this.log(` * file is in ${sourceDialect.name} already`);
+      this.logVerbose(` * file is in ${sourceDialect.name} already`);
       return source;
     }
-    this.log(
+    this.logVerbose(
       ` * from ${sourceDialect.name} to ${this.outputDialect.name} dialect`
     );
 
@@ -144,7 +150,7 @@ class GherkinTranslator {
     const prefix = match[1];
     const suffix = match[3];
     sourceLines[0] = `${prefix}${this.outputDialectCode}${suffix}`;
-    this.log(
+    this.logVerbose(
       ` * line 1: language: ${sourceDialectCode} -> ${this.outputDialectCode}`
     );
   }
@@ -166,10 +172,10 @@ class GherkinTranslator {
     // Try to translate the keyword.
     const translatedKeyword = this.translateKeyword(keyword, sourceDialect);
     if (!translatedKeyword) {
-      this.log(` * found no translation for '${keyword}' keyword`);
+      this.logVerbose(` * found no translation for '${keyword}' keyword`);
       return;
     }
-    this.log(
+    this.logVerbose(
       ` * line ${location.line}: ` +
         `${keyword.trim()} -> ${translatedKeyword.trim()}`
     );
@@ -226,14 +232,21 @@ class GherkinTranslator {
   }
 
   /**
+   * Logs the given text to the console if verbose logging is enabled.
+   *
+   * @param {string} text The text to log to the console.
+   */
+  logVerbose(text) {
+    if (this.enableVerboseLogging) this.log(text);
+  }
+
+  /**
    * Logs the given text to the console if logging is enabled.
    *
    * @param {string} text The text to log to the console.
    */
   log(text) {
-    if (this.enableLogging) {
-      console.log(text);
-    }
+    if (this.enableLogging) console.log(text);
   }
 }
 

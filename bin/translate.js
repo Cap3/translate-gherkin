@@ -34,7 +34,7 @@ program
     "The two letter language code of the language to translate to.",
     GherkinTranslator.DEFAULT_DIALECT_CODE
   )
-  .option("--quiet", "Whether to suppress logging messages.", false)
+  .option("-q, --quiet", "Whether to suppress logging messages.", false)
   .option("-n, --dry-run", "Disables writing to any files.", false)
   .configureOutput({
     outputError: (str, write) => write(chalk.red.bold(str)),
@@ -45,7 +45,8 @@ program
     try {
       const translator = new GherkinTranslator({
         outputDialectCode: opts.dialect,
-        enableLogging: !opts.quiet,
+        enableLogging: true,
+        enableVerboseLogging: !opts.quiet,
         dryRun: opts.dryRun,
       });
 

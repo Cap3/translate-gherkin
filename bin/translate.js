@@ -32,7 +32,7 @@ program
   .option(
     "--dialect <language-code>",
     "The two letter language code of the language to translate to.",
-    "en"
+    GherkinTranslator.DEFAULT_DIALECT_CODE
   )
   .option("--quiet", "Whether to suppress logging messages.", false)
   .option("-n, --dry-run", "Disables writing to any files.", false)

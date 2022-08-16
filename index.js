@@ -9,6 +9,14 @@ const Messages = require("@cucumber/messages");
  * Translator for the keywords in Gherkin files.
  */
 class GherkinTranslator {
+  /**
+   * The language code of the default output dialect.
+   *
+   * This should be the Gherkin default dialect. Language annotations with
+   * this code will be removed automatically.
+   */
+  static DEFAULT_DIALECT_CODE = "en";
+
   constructor({ outputDialectCode, enableLogging, dryRun }) {
     this.enableLogging = enableLogging;
     this.dryRun = dryRun;
@@ -65,16 +73,12 @@ class GherkinTranslator {
     // Do nothing if the document is written in the right dialect already.
     const sourceDialect = Gherkin.dialects[document.feature.language];
     if (sourceDialect == this.outputDialect) {
-      this.log(` - file is in ${sourceDialect.name} already`);
+      this.log(` * file is in ${sourceDialect.name} already`);
       return source;
     }
     this.log(
-      ` - from ${sourceDialect.name} to ${this.outputDialect.name} dialect`
+      ` * from ${sourceDialect.name} to ${this.outputDialect.name} dialect`
     );
-
-    // Translate the language annotation.
-    const sourceLines = source.split("\n");
-    this.translateLanguageComment(sourceLines);
 
     // Walk the Gherkin document and translate the keyword of all nodes.
     const handler = (node, sourceLines) =>
@@ -89,9 +93,14 @@ class GherkinTranslator {
     };
     const translatedLines = GherkinUtils.walkGherkinDocument(
       document,
-      sourceLines,
+      source.split("\n"),
       handlers
     );
+
+    // Translate the language annotation.
+    // This has to be the last step, because the source array might be shifted
+    // due to the insertion or removal of a language comment.
+    this.translateLanguageComment(translatedLines);
     return translatedLines.join("\n");
   }
 
@@ -99,6 +108,10 @@ class GherkinTranslator {
    * Translates the language comment at the top of a Gherkin file.
    *
    * Modifies the first line of the given array in-place.
+   * If the source dialect is the default dialect and there is no language
+   * annotation, a new first line is added with the language annotation.
+   * If the language annotation is not necessary in the target dialect (i.e,
+   * the target dialect is the default dialect), the annotation is removed.
    *
    * @param {string[]} sourceLines An array of the lines of Gherkin source code.
    */
@@ -110,14 +123,30 @@ class GherkinTranslator {
     const firstLine = sourceLines[0];
     const pattern = /^(\s*#\s*language:\s*)(\w+)(\s*)$/;
     const match = firstLine.match(pattern);
-    if (!match) return;
+
+    // If the language annotation is missing, create it.
+    if (!match) {
+      sourceLines.unshift(`# language: ${this.outputDialectCode}`);
+      this.logVerbose(` + line 1: language: ${this.outputDialectCode}`);
+      return;
+    }
+
+    // If the language annotation exists but is not needed in the target
+    // dialect remove it.
+    const sourceDialectCode = match[2];
+    if (this.outputDialectCode == GherkinTranslator.DEFAULT_DIALECT_CODE) {
+      sourceLines.shift();
+      this.logVerbose(` - line 1: language: ${sourceDialectCode}`);
+      return;
+    }
 
     // Replace the first line but keep all spaces as in the input.
     const prefix = match[1];
-    const code = match[2];
     const suffix = match[3];
     sourceLines[0] = `${prefix}${this.outputDialectCode}${suffix}`;
-    this.log(` - line 1: language: ${code} -> ${this.outputDialectCode}`);
+    this.log(
+      ` * line 1: language: ${sourceDialectCode} -> ${this.outputDialectCode}`
+    );
   }
 
   /**
@@ -137,11 +166,11 @@ class GherkinTranslator {
     // Try to translate the keyword.
     const translatedKeyword = this.translateKeyword(keyword, sourceDialect);
     if (!translatedKeyword) {
-      this.log(` - found no translation for '${keyword}' keyword`);
+      this.log(` * found no translation for '${keyword}' keyword`);
       return;
     }
     this.log(
-      ` - line ${location.line}: ` +
+      ` * line ${location.line}: ` +
         `${keyword.trim()} -> ${translatedKeyword.trim()}`
     );
 

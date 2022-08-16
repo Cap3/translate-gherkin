@@ -58,6 +58,15 @@ The tool still displays all files that would be written to and the changes that 
 
 When this flag is set, the tool only prints the names of the input and output files but not a detailed list of all performed changes.
 
+### Updating
+
+The `npx` command automatically installs the `translate-gherkin` tool but does not check for updates.
+If have run the `npx translate-gherkin` command in the past and there is a new version of the tool that you would like to use, you have to clear the `npx` cache with the following command first.
+
+```sh
+npx -y clear-npx-cache
+```
+
 ## Develpment
 
 Before the tool can be executed during development, first install all dependencies of the package by running the following command in the repositories root directory.

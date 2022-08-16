@@ -47,7 +47,7 @@ writes to the output files `./translated/first.feature` and `./translated/direct
 
 The language code (usually two lower case letters) of the output dialect.
 By default the target dialect is English `en`.
-See the [Cucumber Documentation](https://cucumber.io/docs/gherkin/languages/) for a complete list of supported languages.
+See the [Cucumber Documentation][cucumber/languages] for a complete list of supported languages.
 
 #### `-n, --dry-run`
 
@@ -80,3 +80,11 @@ Use the following command to run the tests.
 ```
 npm test
 ```
+
+## License
+
+The `translate-gherkin` tool is licensed under the MIT license agreement.
+See [LICENSE][translate-gherkin/license] file for details.
+
+[cucumber/languages]: https://cucumber.io/docs/gherkin/languages/ "Localisation - Cucumber Documentation"
+[translate-gherkin/license]: https://github.com/cap3/translate-gherkin/blob/main/LICENSE "The MIT License"

@@ -1,9 +1,14 @@
 const fs = require("fs/promises");
 const path = require("path");
 
+const chalk = require("chalk");
 const Gherkin = require("@cucumber/gherkin");
 const GherkinUtils = require("@cucumber/gherkin-utils");
 const Messages = require("@cucumber/messages");
+
+const infoChalk = chalk.bold;
+const removedChalk = chalk.redBright.bold;
+const addedChalk = chalk.greenBright.bold;
 
 /**
  * Translator for the keywords in Gherkin files.
@@ -53,9 +58,9 @@ class GherkinTranslator {
 
     // Translate the Gherkin file.
     this.log(
-      `${
-        this.dryRun ? "Would translate" : "Translating"
-      } ${inputFileName} -> ${outputFileName}`
+      `${this.dryRun ? "Would translate" : "Translating"} ${infoChalk(
+        inputFileName
+      )} -> ${infoChalk(outputFileName)}`
     );
     const translated = this.translateGherkin(source);
 
@@ -79,11 +84,13 @@ class GherkinTranslator {
     // Do nothing if the document is written in the right dialect already.
     const sourceDialect = Gherkin.dialects[document.feature.language];
     if (sourceDialect == this.outputDialect) {
-      this.logVerbose(` * file is in ${sourceDialect.name} already`);
+      this.logVerbose(` * file is in ${infoChalk(sourceDialect.name)} already`);
       return source;
     }
     this.logVerbose(
-      ` * from ${sourceDialect.name} to ${this.outputDialect.name} dialect`
+      ` * from ${infoChalk(sourceDialect.name)} to ${infoChalk(
+        this.outputDialect.name
+      )} dialect`
     );
 
     // Walk the Gherkin document and translate the keyword of all nodes.
@@ -133,7 +140,9 @@ class GherkinTranslator {
     // If the language annotation is missing, create it.
     if (!match) {
       sourceLines.unshift(`# language: ${this.outputDialectCode}`);
-      this.logVerbose(` + line 1: language: ${this.outputDialectCode}`);
+      this.logVerbose(
+        ` + line 1: ${addedChalk(`# language: ${this.outputDialectCode}`)}`
+      );
       return;
     }
 
@@ -142,7 +151,9 @@ class GherkinTranslator {
     const sourceDialectCode = match[2];
     if (this.outputDialectCode == GherkinTranslator.DEFAULT_DIALECT_CODE) {
       sourceLines.shift();
-      this.logVerbose(` - line 1: language: ${sourceDialectCode}`);
+      this.logVerbose(
+        ` - line 1: ${removedChalk(`# language: ${sourceDialectCode}`)}`
+      );
       return;
     }
 
@@ -151,7 +162,9 @@ class GherkinTranslator {
     const suffix = match[3];
     sourceLines[0] = `${prefix}${this.outputDialectCode}${suffix}`;
     this.logVerbose(
-      ` * line 1: language: ${sourceDialectCode} -> ${this.outputDialectCode}`
+      ` * line 1: # language: ${removedChalk(
+        sourceDialectCode
+      )} -> ${addedChalk(this.outputDialectCode)}`
     );
   }
 
@@ -176,8 +189,9 @@ class GherkinTranslator {
       return;
     }
     this.logVerbose(
-      ` * line ${location.line}: ` +
-        `${keyword.trim()} -> ${translatedKeyword.trim()}`
+      ` * line ${location.line}: ${removedChalk(
+        keyword.trim()
+      )} -> ${addedChalk(translatedKeyword.trim())}`
     );
 
     // Replace the keyword in the source line.

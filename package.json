@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/just95/translate-gherkin.git"
+    "url": "git+https://github.com/cap3/translate-gherkin.git"
   },
   "keywords": [
     "Cucumber",
@@ -23,9 +23,9 @@
   "author": "Justin Andresen <justin.andresen@cap3.de>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/just95/translate-gherkin/issues"
+    "url": "https://github.com/cap3/translate-gherkin/issues"
   },
-  "homepage": "https://github.com/just95/translate-gherkin#readme",
+  "homepage": "https://github.com/cap3/translate-gherkin#readme",
   "dependencies": {
     "@cucumber/gherkin": "^24.0.0",
     "@cucumber/gherkin-utils": "^8.0.0",
